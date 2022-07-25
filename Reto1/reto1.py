@@ -4,6 +4,7 @@ import numpy as np
 import matplotlib
 matplotlib.use('TkAgg')
 
+# comentario hecho desde github
 
 """
 - Lectura de datos adf
