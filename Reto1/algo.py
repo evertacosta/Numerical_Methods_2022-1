@@ -1,8 +1,6 @@
-from utils import read_adf, simple_plot
+from utils import read_adf, read_csv, simple_plot
 import numpy as np
 import pandas as pd
-
-df = read_adf('./data/PAula1_WV_03.adf')
 
 
 def get_signo(numero, promedio):
@@ -35,7 +33,10 @@ def segmentos(y):
     for valor in y:
         if get_signo(valor, y.mean()) != signo:
             signo = inverse_signo(signo)
-            s.append(contador)
+            if contador == len(y)-1:
+                pass
+            else:
+                s.append(contador)
 
         contador += 1
 
@@ -58,17 +59,17 @@ def max_by_seg(t, y):
     s = segmentos(y)
 
     for punto in s:
-        #print('segmento', last_index, punto)
+        # print('segmento', last_index, punto)
         grupo = y[last_index:punto]
         grupo_t = t[last_index:punto]
 
         signo = get_signo(grupo[last_index], y.mean())
-        #print('signo', signo)
+        # print('signo', signo)
         if signo:
-            #print(grupo_t[last_index+grupo.argmax()], grupo.max())
+            # print(grupo_t[last_index+grupo.argmax()], grupo.max())
             puntos.append((grupo_t[last_index+grupo.argmax()], grupo.max()))
         else:
-            #print(grupo_t[last_index+grupo.argmin()], grupo.min())
+            # print(grupo_t[last_index+grupo.argmin()], grupo.min())
             puntos.append((grupo_t[last_index + grupo.argmin()], grupo.min()))
 
         last_index = punto
@@ -113,43 +114,19 @@ def voltaje_pico(t, y):
             return punto[1]-y.mean()
 
 
-# lectura de archivos
-def lectura(nombre):
-    """
-    nombre: archivo (str)
-    Lectura de archivos adf o csv.
-    La información está separada en columnas por espacio en blanco o punto y
-    coma.
-    Columna 1: Tiempo.
-    Columna 2: Voltaje.
-    Retorna una matriz (lista de listas).
-    """
-    datos = open(nombre)
-    datos.readline() # primera línea
-    datos.readline() # segunda línea
-    dt = [] # tiempo
-    dv = [] # señal
-    data = dict()
-    for i in datos:
-        if nombre.endswith(".adf"):
-            a = i.split("\t")
-        elif nombre.endswith(".csv"):
-            a = i.split(";")
-        else:
-            print("Tipo de archivo no válido.")
-        dt.append(float(a[0]))
-        dv.append(float(a[1]))
-    datos.close()
-    data = dict(zip(dv, dt))
-    return [dt, dv, data]
 
-datos = lectura('./data/PAula1_WV_03.adf')
+if __name__ == "__main__":
+    #df = read_adf('./data/PAula1_WV_04v.adf')
+    #df = read_csv('./data/Paula1_WV_04.csv')
+    #df = read_csv('./data/Paula1_WV_01.csv')
+    df = read_csv('./data/Paula1_WV_03.csv')
 
-t = pd.Series(datos[0])
-y = pd.Series(datos[1])
+    t = df.t
+    y = df.y
 
-print(periodo(t, y))
-print(frecuencia(t, y))
-print(voltaje_pico(t, y))
-simple_plot(t, y, 'adf 03')
+    aja = max_by_seg(t, y)
+    print(periodo(t, y))
+    print(frecuencia(t, y))
+    print(voltaje_pico(t, y))
+    simple_plot(t, y, 'adf 03')
 
