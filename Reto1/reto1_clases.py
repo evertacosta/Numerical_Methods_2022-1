@@ -191,7 +191,7 @@ class Graficar:
         ax.hlines(self.s.valor_pico*-1, xmin=self.data.t.iat[0], xmax=self.data.t.iat[-1],
                   label='Vpp={}'.format(self.round_result(s.valor_pico_pico)), ls='--', color='r')
 
-        ax.set_xlabel('time')
+        ax.set_xlabel('time1')
         ax.set_ylabel('y')
         ax.set_title('{} T={}, f={}'.format(self.title, self.round_result(s.get_periodo()),
                                             self.round_result(s.get_frecuencia())))
