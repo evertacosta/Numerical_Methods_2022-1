@@ -13,16 +13,28 @@ p2 = read_adf('./datos/Problema2_MN20221_WV_P2.adf')
 p3 = read_adf('./datos/Problema3_MN20221_WV_P2.adf')
 
 
-def error_func(eq_args, eq, final_result, t_span, y0, time_eval):
-    r, l = eq_args
-    sol = solve_ivp(eq, t_span, y0, t_eval=time_eval, args=(r, l)).y[0]
 
+
+def error_func(eq_args, eq, final_result, t_span, y0, time_eval):
+
+    sol = solve_ivp(eq, t_span, y0, t_eval=time_eval, args=tuple(eq_args))
+    #print('len final y sol', len(final_result), len(sol), 'argumentos: tspan y time_eval', t_span, len(time_eval), 'args', tuple(eq_args))
+    #print(sol)
     suma = 0
     nn = len(final_result)
 
-    for i in range(nn):
-        ei = (final_result[i] - sol[i]) ** 2
-        suma = suma + ei
+    soly = sol.y[0]
+
+    infinitos = 0
+
+    if len(final_result) == len(soly):
+        for i in range(nn):
+            ei = (final_result[i] - soly[i]) ** 2
+            suma = suma + ei
+    else:
+        suma = 0
+        infinitos += 1
 
     error = suma / nn
+    #print('infinitos encontrados', infinitos)
     return error
