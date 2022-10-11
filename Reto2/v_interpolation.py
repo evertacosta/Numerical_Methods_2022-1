@@ -34,12 +34,14 @@ def seno(t, theta):
     return am*np.sin(t*w + a)
 
 
-aja1 = np.array(p2.index)[50:]
-aja2 = np.array(p2.y1)[50:]
-print(aja1)
-print(aja2)
+tiempo_original = np.array(p2.index)
+voltaje = np.array(p2.y1)[50:]
+print(tiempo_original)
+print(voltaje)
 
-print(least_square_method(aja1, seno, [99, 55, 0.1], aja2))
+n_tiempo = np.arange(0, 0.0951, 0.0001)
+
+print(least_square_method(n_tiempo, seno, [99, 55, 0.1], voltaje))
 
 """
 plt.plot(p1.index, p1.y1)
@@ -49,9 +51,9 @@ plt.show()
 """
 
 
-plt.plot(aja1, aja2)
+#plt.plot(tiempo_original, voltaje)
 #plt.plot(aja1, v(aja1))
-plt.plot(aja1, seno(aja1, [-99.98136029, 60.00641109, -1.57354255]))
+plt.plot(n_tiempo, seno(n_tiempo, [99.98136029, 60.00641109, -2.8299782]))
 plt.show()
 
 

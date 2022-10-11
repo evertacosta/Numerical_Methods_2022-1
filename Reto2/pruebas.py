@@ -41,10 +41,12 @@ sol2_prueba = np.array(sol2.y[0])
 
 #sol3 = solve_ivp(rl_equation2, (0.0, 0.003), [0], t_eval=time2, args=(100, 0.2))
 #sol3_prueba = np.array(sol3.y[0])
+
+
 sol3_prueba = np.array(p1.y2)
 
-#res1 = minimize(funcion_error, [1, 1], args=(rl_equation1, sol2_prueba, (0, 0.2), [0], time1), method='Powell')
-#print(res1)
+res1 = minimize(error_func, [1, 0.1], args=(rl_equation1, sol2_prueba, (0, 0.2), [0], time1), method='Powell')
+print(res1)
 
 res2 = minimize(error_func, [1, 0.01], args=(rl_equation2, sol3_prueba, (0, 0.003), [0], time2), method='Powell')
 print(res2)

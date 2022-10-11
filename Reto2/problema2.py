@@ -29,7 +29,7 @@ class Solver:
         nn = len(final_result)
 
         for i in range(nn):
-            ei = (final_result[i] - sol[i]) ** 2
+            ei = (sol[i] - final_result[i]) ** 2
             suma = suma + ei
 
         error = suma / nn
@@ -40,21 +40,6 @@ class Solver:
                                                            self.time_eval), method=self.minimize_method)
 
         return a
-
-
-def rlc_equation(t, y, r, l, c):
-    # primera derivada y' = omega
-    am, f, a = [-99.98136029, 60.00641109, -1.57354255]
-    w = np.pi * 2 * f
-    vs = am * np.sin((t*w) + a)
-
-    # version original Evert acosta 10/10/2022
-
-    theta, omega = y
-
-    return [omega, -(r/l)*omega - (1/(l*c))*theta + (vs/l)]
-
-
 class RLC(Solver):
     def __init__(self, file):
         time_start = 50
@@ -67,6 +52,20 @@ class RLC(Solver):
 
     def solve(self):
         self.solve_minimize([0.1, 0.1, 0.1], rlc_equation, self.current, [-34.4643, 0])
+
+def rlc_equation(t, y, r, l, c):
+    # primera derivada y' = omega
+    am, f, a = [99.98136029, 60.00641109, -2.8299782]
+    w = np.pi * 2 * f
+    vs = am * np.sin((t*w) + a)
+
+    # version original Evert acosta 10/10/2022
+
+    Is, Vc = y  # corriente del circuito, voltaje en condensador
+
+    di = (1 / l) * (vs - r*Is - Vc)
+    dvc = (1/c) * Is
+    return [di, dvc]
 
 
 if __name__ == "__main__":
@@ -90,17 +89,22 @@ if __name__ == "__main__":
 
 
     # tiempo
-    aja1 = np.array(p2.index)[50:]
+    tiempo = np.arange(0, 0.0951, 0.0001)
     # solucion
-    aja3 = np.array(p2.y2)[50:]
+    valor_medido = np.array(p2.y2)[50:]
+    print(tiempo[0], tiempo[-1])
+    print(valor_medido[1], valor_medido[-1])
+    print(len(np.arange(0, 0.0951, 0.0001)) == len(np.array(p2.y2)[50:]))
+    sol_valores_respuesta = solve_ivp(rlc_equation, (0, 0.095), [0, 0], t_eval=tiempo, args=(3.99517494e+00, 1.00170237e-01, 9.99989481e-06))
 
-    res_final = minimize(error_func, [0.1, 0.1, 0.1], args=(rlc_equation, aja3, (0, 0.1), [0, 0],
-                                                             aja1), method='Powell')
+    res_final = minimize(error_func, np.array([1, 0.095, 9e-6]), args=(rlc_equation, valor_medido, (0, 0.1), [0, 0], tiempo), method='Powell')
 
+    print(res_final)
     print(res_final.x)
-    sol_comprobacion = solve_ivp(rlc_equation, (0, 0.1), [0, 0], t_eval=aja1, args=tuple(res_final.x))
+    sol_comprobacion = solve_ivp(rlc_equation, (0, 0.095), [0, 0], t_eval=tiempo, args=tuple(res_final.x))
 
-    plt.plot(aja1, aja3)
+    plt.plot(tiempo, valor_medido)
+    plt.plot(sol_valores_respuesta.t, sol_valores_respuesta.y[0])
     plt.plot(sol_comprobacion.t, sol_comprobacion.y[0])
     plt.show()
 
