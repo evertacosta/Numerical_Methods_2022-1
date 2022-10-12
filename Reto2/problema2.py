@@ -107,6 +107,3 @@ if __name__ == "__main__":
     plt.plot(sol_valores_respuesta.t, sol_valores_respuesta.y[0])
     plt.plot(sol_comprobacion.t, sol_comprobacion.y[0])
     plt.show()
-
-
-
